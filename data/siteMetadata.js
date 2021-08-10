@@ -2,7 +2,7 @@ const siteMetadata = {
   title: 'Mra Blog',
   author: 'Lê Bá Tuấn Anh',
   headerTitle: 'MRA BLOG',
-  description: 'Chia sẻ kiến thức về lập trình, đời sống, công nghệ',
+  description: 'Blog chia sẻ kiến thức về lập trình, đời sống, công nghệ',
   language: 'vi-VN',
   siteUrl: 'https://blog.programersgang.tech',
   siteRepo: 'https://github.com/mramra3004/mra-blog',
