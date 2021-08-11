@@ -1,0 +1,208 @@
+---
+title: C# - Thread (Phần 1)
+date: '2021-08-11'
+tags: ['C#', 'code', '']
+draft: false
+summary: Tìm hiểu về thread trong C#
+images: []
+layout: PostLayout
+---
+
+## Tổng quan
+
+<TOCInline toc={props.toc} asDisclosure title={'Nội dung'} />
+
+Trong bài viết này chúng ta sẽ đi tìm hiểu về **Thread**, một khái niệm quan trọng trong các ứng dụng về mạng.
+**Thread** (luồng) cho phép chương trình chạy đồng thời nhiều tác vụ giúp quá trình tương tác với người dùng không bị gián đoạn.
+
+## Tạo mới thread trong C#
+
+```csharp
+class Program
+{
+    static void Main(string[] args)
+    {
+        Console.WriteLine("Create new thread.");
+        Thread thread = new Thread(new ThreadStart(Write));
+        Console.WriteLine("New thread start.");
+        thread.Start();
+
+        for (int i = 0; i < 100; i++)
+            Console.Write("_");
+
+        Console.Write("Main thread finished!");
+        Console.ReadKey();
+    }
+
+    static void Write()
+    {
+        for (int i = 0; i < 100; i++)
+            Console.Write("*");
+        Console.Write("New thread finished!");
+    }
+}
+```
+
+Kết quả:
+
+```
+Create new thread.
+New thread start.
+_****************************************************************************************************New thread finished!___________________________________________________________________________________________________Main thread finished!
+```
+
+<div className="flex flex-wrap -mx-2 overflow-hidden xl:-mx-2">
+  <div className="my-1 px-2 w-full overflow-hidden xl:my-1 xl:px-2 xl:w-1/2">
+    <Image alt="Maple" src="/static/images/threadP1/MultipleThread.png" width={640} height={427} />
+  </div>
+</div>
+
+**Chú ý:** Khi tạo đối tượng **Thread** và truyền delegate **ThreadStart** chứa phương thức sẽ thực thi vào constructor của **Thread** chúng ta có thể viết ngắn gọn thành:
+
+```csharp
+Thread thread = new Thread(Write);
+```
+
+Trình biên dịch sẽ tự động tạo ra đối tượng **ThreadStart** dựa vào phương thức mà bạn truyền vào.
+Ok như vậy là chúng ta đã biết cách tạo mới một thread và cách một thread mới chạy rồi!
+
+## Truyền tham số cho thread
+
+Phần trước ta đã tạo được thread không có tham số truyền vào sử dụng **ThreadStart**, khi bạn muốn truyền tham số cho thread thì sao?
+**ParameteriedThreadStart** sẽ thay thế cho **ThreadStart** làm điều đó! Một chú ý nhỏ là **ParameteriedThreadStart** chỉ nhận tham số kiểu
+object vì vậy trong phương thức callback chúng ta cần ép kiểu để sử dụng đúng kiểu dữ liệu của tham số.
+
+```csharp
+class Student
+{
+    public string Name { get; set; }
+    public int Age { get; set; }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Student s = new Student { Name = "Nguyen", Age = 18 };
+        Console.WriteLine("Create new thread.");
+        Thread thread = new Thread(PrintStudent);
+        Console.WriteLine("New thread start.");
+        thread.Start(s);
+        //thread.Join();
+
+        for (int i = 0; i < 100; i++)
+        {
+            Thread.Sleep(10);
+            Console.Write("_");
+        }
+
+        Console.Write("Main thread finished!");
+        Console.ReadKey();
+    }
+
+    public static void PrintStudent(object value)
+    {
+        Student s = value as Student;
+        Thread.Sleep(1000);
+        Console.Write(s.Name + " " + s.Age);
+    }
+}
+```
+
+Kết quả:
+
+```
+Create new thread.
+New thread start.
+__________________________________________________________________________Nguyen 18__________________________Main thread finished!
+```
+
+## Trạng thái và độ ưu tiên của Thread
+
+**ThreadState**: ThreadState cho biết trạng thái hiện tại của thread
+
+<div className="flex flex-wrap -mx-2 overflow-hidden xl:-mx-2">
+  <div className="my-1 px-2 w-full overflow-hidden xl:my-1 xl:px-2 xl:w-1/2">
+    <Image alt="Maple" src="/static/images/threadP1/ThreadState.jpg" width={640} height={427} />
+  </div>
+</div>
+
+Các phương thức _Stop()_, _Suspend()_, _Abort()_ khá dễ hiểu nên chúng ta sẽ không đi sâu trong bài viết này, chúng ta sẽ chỉ quan tâm đến phương thức _Join()_.
+
+**Phương thức Join:** Phương thức này rất hữu dụng trong trường hợp chúng ta muốn thực hiện một tác vụ sau khi thread đã kết thúc.
+
+Ok, bây giờ chúng ta thử UnComment đoạn: **thread.Join();** phía trên và chạy lại sẽ được:
+
+```
+Create new thread.
+New thread start.
+Nguyen 18____________________________________________________________________________________________________Main thread finished!
+```
+
+Như vậy, main thread sẽ in ra "\_" sau khi new thread chạy xong.
+
+**ThreadPriority:** thuộc tính xác định độ ưu tiên mỗi thread (mặc định một thread mới được tạo ra sẽ có độ ưu tiên là Normal), độ ưu tiên thread được xác đinh thông qua enum ThreadPriority.
+
+```csharp
+public enum ThreadPriority
+{
+    Lowest = 0,
+    BelowNormal = 1,
+    Normal = 2,
+    AboveNormal = 3,
+    Highest = 4
+}
+```
+
+Thông thường ta rất khó có thể nhận ra sự chệnh lệch giữa các thread với độ ưu tiên khác nhau.
+
+## Foreground Thread và Background Thread
+
+Khi chúng ta tạo mới một thread thì thread đó mặc định sẽ là **Foreground thread**.
+Ứng dụng vẫn sẽ tiếp tục chạy cho đến khi **Foreground thread** chạy xong ngay cả khi main thread đã hoàn thành hoặc ta tắt ứng dụng.
+Ngược lại với đó là **Background thread**, khi ta tắt ứng dụng thì **Background thread** sẽ dừng cho dù vẫn chưa chạy xong.
+
+```csharp:ForegroundThread.cs
+static void Main(string[] args)
+{
+    Thread thread = new Thread(() =>
+    {
+        Thread.Sleep(1000);
+        Console.WriteLine("New thread finished!");
+        Thread.Sleep(1000);//Chờ hiển thị xong mới tắt console
+    });
+    thread.Start();
+    Console.WriteLine("Main thread finished!");
+}
+```
+
+Kết quả:
+
+```
+Main thread finished!
+New thread finished!
+```
+
+```csharp:BackgroundThread.cs
+static void Main(string[] args)
+{
+    Thread thread = new Thread(() =>
+    {
+        Thread.Sleep(1000);
+        Console.WriteLine("New thread finished!");
+        Thread.Sleep(1000);//Chờ hiển thị xong mới tắt console
+    });
+    thread.IsBackground = true;
+    thread.Start();
+    Console.WriteLine("Main thread finished!");
+}
+```
+
+Kết quả:
+
+```
+Main thread finished!
+```
+
+Đoạn code trên mình không sử dụng **Console.ReadKey();** để giữ màn hình Console vì khi sử dụng **Console.ReadKey();**
+thì main thread vẫn chưa kết thúc, mà chúng ta lại muốn main thread kết thúc để kiểm tra new thread (ở chế độ **Background**) có chết khi main thread hoàn thành không.

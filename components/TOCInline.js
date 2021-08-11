@@ -16,6 +16,7 @@
  *  fromHeading?: number,
  *  toHeading?: number,
  *  asDisclosure?: boolean,
+ *  title:string,
  *  exclude?: string|string[]
  * }} props
  *
@@ -26,6 +27,7 @@ const TOCInline = ({
   fromHeading = 1,
   toHeading = 6,
   asDisclosure = false,
+  title = '',
   exclude = '',
 }) => {
   const re = Array.isArray(exclude)
@@ -51,7 +53,11 @@ const TOCInline = ({
     <>
       {asDisclosure ? (
         <details open>
-          <summary className="pt-2 pb-2 ml-6 text-xl font-bold">Table of Contents</summary>
+          {title ? (
+            <summary className="pt-2 pb-2 ml-6 text-xl font-bold">{title}</summary>
+          ) : (
+            <summary className="pt-2 pb-2 ml-6 text-xl font-bold">Table of Contents</summary>
+          )}
           <div className="ml-6">{tocList}</div>
         </details>
       ) : (
