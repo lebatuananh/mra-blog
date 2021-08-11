@@ -1,0 +1,82 @@
+---
+title: Docker Cheat Sheet
+date: '2021-08-11'
+tags: ['Docker', 'Linux']
+draft: false
+summary: Tổng hợp câu lệnh hay sử dụng trong Docker
+images: ['/static/images/dockerCheatSheet/Banner_docker.jpg']
+layout: PostSimple
+---
+
+![tailwind-nextjs-banner](/static/images/dockerCheatSheet/Banner_docker.jpg)
+
+## Tổng quan
+
+<TOCInline toc={props.toc} asDisclosure title={'Nội dung'} />
+
+## Cài đặt
+
+### Linux
+
+Xem chi tiết cách cài đặt tại [đây !](https://docs.docker.com/get-docker/)
+
+```
+curl -sSL https://get.docker.com/ | sh
+```
+
+### Mac
+
+Xem chi tiết cách cài đặt tại [đây !](https://docs.docker.com/docker-for-mac/install/)
+
+Sử dụng đường dẫn này để tải file dmg, sau đó mở file đã tải và cài đặt như hướng dẫn
+
+```
+https://download.docker.com/mac/stable/Docker.dmg
+```
+
+### Windows
+
+Xem chi tiết cách cài đặt tại [đây !](https://docs.docker.com/docker-for-windows/install/)
+
+Sử dụng đường dẫn này để tải file msi, sau đó mở file đã tải và cài đặt như hướng dẫn
+
+```
+https://download.docker.com/win/stable/InstallDocker.msi
+```
+
+## Docker Registries & Repositories
+
+### Login Registry
+
+```
+docker login
+docker login localhost:8080
+```
+
+### LogOut Registry
+
+```
+docker logout
+docker logout localhost:8080
+```
+
+### Searching image
+
+```
+docker search nginx
+docker search --filter stars=3 --no-trunc nginx
+```
+
+### Pull Image
+
+```
+docker image pull nginx
+docker image pull eon01/nginx localhost:5000/myadmin/nginx
+```
+
+### Pushing Registry
+
+```
+docker image push eon01/nginx
+docker image push eon01/nginx localhost:5000/myadmin/nginx
+```
