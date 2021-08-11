@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
 
 import siteMetadata from '@/data/siteMetadata'
@@ -19,6 +19,7 @@ const Giscus = ({ mapping }) => {
     setEnabledLoadComments(false)
     const script = document.createElement('script')
     script.src = 'https://giscus.app/client.js'
+    console.log('test', siteMetadata.comment.giscusConfig)
     script.setAttribute('data-repo', siteMetadata.comment.giscusConfig.repo)
     script.setAttribute('data-repo-id', siteMetadata.comment.giscusConfig.repositoryId)
     script.setAttribute('data-category', siteMetadata.comment.giscusConfig.category)
@@ -38,6 +39,10 @@ const Giscus = ({ mapping }) => {
       if (comments) comments.innerHTML = ''
     }
   }
+
+  useEffect(() => {
+    LoadComments()
+  })
 
   return (
     <div className="pt-6 pb-6 text-center text-gray-700 dark:text-gray-300">
